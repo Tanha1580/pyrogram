@@ -166,6 +166,8 @@ class Sticker(Object):
         else:
             set_name = None
 
+        print(sticker)
+
         return Sticker(
             file_id=FileId(
                 file_type=FileType.STICKER,
