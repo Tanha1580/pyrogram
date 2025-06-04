@@ -45,7 +45,7 @@ from pyrogram.errors import (
     SessionPasswordNeeded,
     VolumeLocNotFound, ChannelPrivate,
     BadRequest, AuthBytesInvalid,
-    FloodWait, FloodPremiumWait,
+    FloodWait, FloodPremiumWait, LocationInvalid,
     ChannelInvalid, PersistentTimestampInvalid, PersistentTimestampOutdated
 )
 from pyrogram.handlers.handler import Handler
@@ -1038,7 +1038,7 @@ class Client(Methods):
             if isinstance(e, asyncio.CancelledError):
                 raise e
 
-            if isinstance(e, (FloodWait, FloodPremiumWait)):
+            if isinstance(e, (FloodWait, FloodPremiumWait, LocationInvalid)):
                 raise e
 
             return None
@@ -1272,7 +1272,7 @@ class Client(Methods):
                         await cdn_session.stop()
             except pyrogram.StopTransmission:
                 raise
-            except (FloodWait, FloodPremiumWait):
+            except (FloodWait, FloodPremiumWait, LocationInvalid):
                 raise
             except Exception as e:
                 log.exception(e)
