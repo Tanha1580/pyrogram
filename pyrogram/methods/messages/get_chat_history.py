@@ -60,7 +60,8 @@ class GetChatHistory:
         offset_id: int = 0,
         offset_date: datetime = utils.zero_datetime(),
         min_id: int = 0,
-        max_id: int = 0
+        max_id: int = 0,
+        reverse: bool = False
     ) -> AsyncGenerator["types.Message", None]:
         """Get messages from a chat history.
 
@@ -94,6 +95,9 @@ class GetChatHistory:
             max_id (``int``, *optional*):
                 If a positive value was provided, the method will return only messages with IDs less than max_id.
 
+            reverse (``bool``, *optional*):
+                If set to True, starts returning from the first (top) message of the chat. Defaults to False.
+
         Returns:
             ``Generator``: A generator yielding :obj:`~pyrogram.types.Message` objects.
 
@@ -106,6 +110,15 @@ class GetChatHistory:
         current = 0
         total = limit or (1 << 31) - 1
         limit = min(100, total)
+
+        if reverse:
+           result = await get_chunk(client=self, 
+                                    chat_id=chat_id, 
+                                    limit=1, 
+                                    offset=-1, 
+                                    from_date=datetime.fromtimestamp(1))
+           offset_id = result[0].id
+           offset = -limit
 
         while True:
             messages = await get_chunk(
@@ -121,7 +134,10 @@ class GetChatHistory:
 
             if not messages:
                 return
-
+            
+            if reverse:
+               messages.reverse()
+               
             offset_id = messages[-1].id
 
             for message in messages:
