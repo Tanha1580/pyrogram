@@ -932,9 +932,9 @@ class Client(Methods):
                     module = import_module(module_path)
 
                     for name in vars(module).keys():
-                        # noinspection PyBroadException
-                        try:
-                            for handler, group in getattr(module, name).handlers:
+                        target_attr = getattr(module, name)
+                        if hasattr(target_attr, "handlers"):
+                            for handler, group in target_attr.handlers:
                                 if isinstance(handler, Handler) and isinstance(group, int):
                                     self.add_handler(handler, group)
 
@@ -942,8 +942,6 @@ class Client(Methods):
                                         self.name, type(handler).__name__, name, group, module_path))
 
                                     count += 1
-                        except Exception:
-                            pass
             else:
                 for path, handlers in include:
                     module_path = root + "." + path
@@ -964,9 +962,9 @@ class Client(Methods):
                         warn_non_existent_functions = False
 
                     for name in handlers:
-                        # noinspection PyBroadException
-                        try:
-                            for handler, group in getattr(module, name).handlers:
+                        target_attr = getattr(module, name)
+                        if hasattr(target_attr, "handlers"):
+                            for handler, group in target_attr.handlers:
                                 if isinstance(handler, Handler) and isinstance(group, int):
                                     self.add_handler(handler, group)
 
@@ -974,10 +972,9 @@ class Client(Methods):
                                         self.name, type(handler).__name__, name, group, module_path))
 
                                     count += 1
-                        except Exception:
-                            if warn_non_existent_functions:
-                                log.warning('[{}] [LOAD] Ignoring non-existent function "{}" from "{}"'.format(
-                                    self.name, name, module_path))
+                        elif warn_non_existent_functions:
+                            log.warning('[{}] [LOAD] Ignoring non-existent function "{}" from "{}"'.format(
+                                self.name, name, module_path))
 
             if exclude:
                 for path, handlers in exclude:
@@ -999,9 +996,9 @@ class Client(Methods):
                         warn_non_existent_functions = False
 
                     for name in handlers:
-                        # noinspection PyBroadException
-                        try:
-                            for handler, group in getattr(module, name).handlers:
+                        target_attr = getattr(module, name)
+                        if hasattr(target_attr, "handlers"):
+                            for handler, group in target_attr.handlers:
                                 if isinstance(handler, Handler) and isinstance(group, int):
                                     self.remove_handler(handler, group)
 
@@ -1009,10 +1006,9 @@ class Client(Methods):
                                         self.name, type(handler).__name__, name, group, module_path))
 
                                     count -= 1
-                        except Exception:
-                            if warn_non_existent_functions:
-                                log.warning('[{}] [UNLOAD] Ignoring non-existent function "{}" from "{}"'.format(
-                                    self.name, name, module_path))
+                        elif warn_non_existent_functions:
+                            log.warning('[{}] [UNLOAD] Ignoring non-existent function "{}" from "{}"'.format(
+                                self.name, name, module_path))
 
             if count > 0:
                 log.info('[{}] Successfully loaded {} plugin{} from "{}"'.format(
