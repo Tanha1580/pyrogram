@@ -53,6 +53,9 @@ class ConvertGiftToStars:
                 # Convert gift
                 await app.convert_gift_to_stars(message_id=123)
         """
+        if not isinstance(owned_gift_id, str):
+            raise ValueError(f"owned_gift_id has to be str, but {type(owned_gift_id)} was provided")
+    
         saved_gift_match = re.match(r"^(-\d+)_(\d+)$", owned_gift_id)
         slug_match = self.UPGRADED_GIFT_RE.match(owned_gift_id)
 

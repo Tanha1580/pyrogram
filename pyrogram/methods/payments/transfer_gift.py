@@ -65,7 +65,8 @@ class TransferGift:
                 # Transfer gift to another user
                 await app.transfer_gift(owned_gift_id="123", new_owner_chat_id=123)
         """
-        owned_gift_id = str(owned_gift_id)
+        if not isinstance(owned_gift_id, str):
+            raise ValueError(f"owned_gift_id has to be str, but {type(owned_gift_id)} was provided")
 
         saved_gift_match = re.match(r"^(-\d+)_(\d+)$", owned_gift_id)
         slug_match = self.UPGRADED_GIFT_RE.match(owned_gift_id)

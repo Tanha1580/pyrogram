@@ -51,7 +51,8 @@ class SetGiftResalePrice:
                 # Change resale price of a unique gift
                 await app.set_gift_resale_price(owned_gift_id="123456", resale_star_count=100)
         """
-        owned_gift_id = str(owned_gift_id)
+        if not isinstance(owned_gift_id, str):
+            raise ValueError(f"owned_gift_id has to be str, but {type(owned_gift_id)} was provided")
 
         saved_gift_match = re.match(r"^(-\d+)_(\d+)$", owned_gift_id)
         slug_match = self.UPGRADED_GIFT_RE.match(owned_gift_id)

@@ -66,7 +66,8 @@ class UpgradeGift:
                 # Upgrade gift in channel (owned_gift_id packed in format chatID_savedID)
                 await app.upgrade_gift(owned_gift_id="123_456")
         """
-        owned_gift_id = str(owned_gift_id)
+        if not isinstance(owned_gift_id, str):
+            raise ValueError(f"owned_gift_id has to be str, but {type(owned_gift_id)} was provided")
 
         saved_gift_match = re.match(r"^(-\d+)_(\d+)$", owned_gift_id)
         slug_match = self.UPGRADED_GIFT_RE.match(owned_gift_id)
