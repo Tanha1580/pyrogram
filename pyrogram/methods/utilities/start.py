@@ -17,7 +17,6 @@
 #  along with Pyrogram.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from typing import List
 
 import pyrogram
 from pyrogram import raw
@@ -27,27 +26,12 @@ log = logging.getLogger(__name__)
 
 class Start:
     async def start(
-        self: "pyrogram.Client", *,
-        use_qr: bool = False,
-        except_ids: List[int] = [],
+        self: "pyrogram.Client"
     ):
         """Start the client.
 
         This method connects the client to Telegram and, in case of new sessions, automatically manages the
         authorization process using an interactive prompt.
-
-        .. note::
-
-            You should install ``qrcode`` package if you want to use QR code authorization.
-
-        Parameters:
-            use_qr (``bool``, *optional*):
-                Use QR code authorization instead of the interactive prompt.
-                For new authorizations only.
-                Defaults to False.
-
-            except_ids (List of ``int``, *optional*):
-                List of already logged-in user IDs, to prevent logging in twice with the same user.
 
         Returns:
             :obj:`~pyrogram.Client`: The started client itself.
@@ -58,35 +42,26 @@ class Start:
         Example:
             .. code-block:: python
 
-                import asyncio
-
                 from pyrogram import Client
+
+                app = Client("my_account")
 
 
                 async def main():
-                    app = Client("my_account")
-
                     await app.start()
                     ...  # Invoke API methods
                     await app.stop()
 
-                asyncio.run(main())
+
+                app.run(main())
         """
         is_authorized = await self.connect()
 
         try:
             if not is_authorized:
-                if use_qr:
-                    try:
-                        import qrcode
-                        await self.authorize_qr(except_ids=except_ids)
-                    except ImportError:
-                        log.warning("qrcode package not found, falling back to authorization prompt")
-                        await self.authorize()
-                else:
-                    await self.authorize()
+                await self.authorize()
 
-            if self.takeout and not await self.storage.is_bot():
+            if not await self.storage.is_bot() and self.takeout:
                 self.takeout_id = (await self.invoke(raw.functions.account.InitTakeoutSession())).id
                 log.info("Takeout session %s initiated", self.takeout_id)
 
